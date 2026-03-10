@@ -619,9 +619,7 @@
         showWelcome();
       }
 
-      // Hide controls initially
-      toggleControls()
-
+      
       // Try to load saved URL for this slide
       try {
         if (Office.context && Office.context.document && Office.context.document.settings) {
@@ -639,6 +637,8 @@
       } catch (e) {
         // Silent: Office API not available (standalone/testing mode)
       }
+      // Hide controls initially
+      toggleControls()
     });
   </script>
 </body>

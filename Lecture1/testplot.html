@@ -5,29 +5,42 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <style>
   html, body {
-    height: 100vh;
-    width: 100vw;
+    height: 100%;
+    width: 100%;
     margin: 0;     /* remove default margins */
     padding: 0;
     overflow: hidden;
     background: #fff;
   }
-  /* Container that will hold Plotly's div */
-  .plot-container {
-    height: 100vh;   /* or 100% if you prefer */
-    width: 100vw;
-  }
+  
+#wrap {
+        height: 100dvh;   /* works inside PowerPoint iframe */
+        width: 100vw;
+    }
+
+#wrap > div {
+        height: 100% !important;
+        width: 100% !important;
+    }
+
+.plotly-graph-div {
+        height: 100% !important;
+        width: 100% !important;
+    }
+
 </style>
 </head>
 <body>
-  <div class="plot-container">
-    <html>
+    
+<div id="wrap">
+        <html>
 <head><meta charset="utf-8" /></head>
 <body>
     <div>                        <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
-        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.3.1.min.js" integrity="sha256-4rD3fugVb/nVJYUv5Ky3v+fYXoouHaBSP20WIJuEiWg=" crossorigin="anonymous"></script>                <div id="4e444e98-7723-4b42-bfea-461628fa55b6" class="plotly-graph-div" style="height:400px; width:400px;"></div>            <script type="text/javascript">                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("4e444e98-7723-4b42-bfea-461628fa55b6")) {                    Plotly.newPlot(                        "4e444e98-7723-4b42-bfea-461628fa55b6",                        [{"x":{"dtype":"i1","bdata":"AAECAwQFBgcICQ=="},"y":{"dtype":"i1","bdata":"AAECAwQFBgcICQ=="},"type":"scatter"}],                        {"template":{"data":{"scatter":[{"type":"scatter"}]}},"margin":{"l":0,"r":0,"t":0},"width":400,"height":400},                        {"responsive": true}                    )                };            </script>        </div>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.3.1.min.js" integrity="sha256-4rD3fugVb/nVJYUv5Ky3v+fYXoouHaBSP20WIJuEiWg=" crossorigin="anonymous"></script>                <div id="4e872c0c-0331-4294-9532-923a34da7a26" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("4e872c0c-0331-4294-9532-923a34da7a26")) {                    Plotly.newPlot(                        "4e872c0c-0331-4294-9532-923a34da7a26",                        [{"x":{"dtype":"i1","bdata":"AAECAwQFBgcICQ=="},"y":{"dtype":"i1","bdata":"AAECAwQFBgcICQ=="},"type":"scatter"}],                        {"template":{"data":{"scatter":[{"type":"scatter"}]}},"margin":{"l":15,"r":10,"t":10,"b":20},"autosize":true},                        {"responsive": true}                    )                };            </script>        </div>
 </body>
 </html>
-  </div>
+    </div>
+
 </body>
 </html>

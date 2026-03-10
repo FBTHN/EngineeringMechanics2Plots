@@ -7,14 +7,14 @@ fig = go.Figure()
 x = np.arange(10)
 fig.add_trace(go.Scatter(x=x,y=x));
 
-fig.update_layout(margin=dict(l=0, r=0, t=0),width=400,height=400)
+fig.update_layout(margin=dict(l=15, r=10, t=10,b=20),autosize=True)
+
 
 # Save html
 html = fig.to_html(
     full_html=True,
     include_plotlyjs='cdn',     # smaller file; loads Plotly from CDN
-    default_width="100%",
-    default_height="100%",
+    config = {"responsive": True}
 )
 
 # Wrap it in a minimal full-screen HTML template
@@ -26,24 +26,37 @@ fullscreen_html = f"""<!DOCTYPE html>
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <style>
   html, body {{
-    height: 100vh;
-    width: 100vw;
+    height: 100%;
+    width: 100%;
     margin: 0;     /* remove default margins */
     padding: 0;
     overflow: hidden;
     background: #fff;
   }}
-  /* Container that will hold Plotly's div */
-  .plot-container {{
-    height: 100vh;   /* or 100% if you prefer */
-    width: 100vw;
-  }}
+  
+#wrap {{
+        height: 100dvh;   /* works inside PowerPoint iframe */
+        width: 100vw;
+    }}
+
+#wrap > div {{
+        height: 100% !important;
+        width: 100% !important;
+    }}
+
+.plotly-graph-div {{
+        height: 100% !important;
+        width: 100% !important;
+    }}
+
 </style>
 </head>
 <body>
-  <div class="plot-container">
-    {html}
-  </div>
+    
+<div id="wrap">
+        {html}
+    </div>
+
 </body>
 </html>"""
 

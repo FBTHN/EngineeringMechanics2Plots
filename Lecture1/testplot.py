@@ -7,7 +7,7 @@ fig = go.Figure()
 x = np.arange(10)
 fig.add_trace(go.Scatter(x=x,y=x));
 
-fig.update_layout(margin=dict(l=0, r=0, t=0),width=800,height=800)
+fig.update_layout(margin=dict(l=0, r=0, t=0),width=400,height=400)
 
 # Save html
 html = fig.to_html(

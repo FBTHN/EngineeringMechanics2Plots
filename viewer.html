@@ -15,7 +15,8 @@
     /* Control bar */
     #config {
       position: absolute;
-      top: 12px;
+      /* MODIFIED: Changed from top to bottom positioning */
+      bottom: 12px;
       left: 12px;
       right: 12px;
       z-index: 100;
@@ -25,13 +26,14 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+      box-shadow: 0 -2px 12px rgba(0,0,0,0.12); /* MODIFIED: Adjusted shadow for bottom bar */
       transition: opacity 0.3s ease, transform 0.3s ease;
     }
 
     #config.hidden {
       opacity: 0;
-      transform: translateY(-20px);
+      /* MODIFIED: Changed transform to move down when hiding */
+      transform: translateY(20px);
       pointer-events: none;
     }
 
@@ -95,7 +97,8 @@
     /* Toggle button (when controls are hidden) */
     #toggleBtn {
       position: absolute;
-      top: 8px;
+      /* MODIFIED: Changed from top to bottom positioning */
+      bottom: 8px;
       right: 8px;
       z-index: 101;
       width: 36px;
@@ -117,7 +120,8 @@
     /* Environment badge */
     #envBadge {
       position: absolute;
-      top: 58px;
+      /* MODIFIED: Positioned above the new bottom control bar */
+      bottom: 68px;
       right: 12px;
       z-index: 100;
       padding: 4px 10px;
@@ -294,7 +298,6 @@
 <div id="appWrapper">
 
   <!-- Control bar -->
-  <!-- MODIFIED: Added class="hidden" to make the control bar hidden by default -->
   <div id="config" class="hidden">
     <span class="icon">🌐</span>
     <input id="urlInput" type="text" placeholder="Enter website URL (e.g. https://example.com)" />
@@ -304,25 +307,22 @@
   </div>
 
   <!-- Show controls button -->
-  <!-- MODIFIED: Added class="visible" to show the toggle button by default -->
   <button id="toggleBtn" class="visible" onclick="toggleControls()" title="Show controls">⚙</button>
 
   <!-- Environment badge -->
-  <!-- MODIFIED: Added class="hidden" to hide the badge by default -->
   <div id="envBadge" class="hidden"></div>
 
   <!-- Welcome overlay -->
   <div id="overlay">
     <div class="emoji">🌐</div>
     <h2>Live Website Viewer</h2>
-    <p>Enter a website URL using the settings button (⚙) above and click <strong>Load</strong> to display it inside this slide.</p>
+    <p>Enter a website URL using the settings button (⚙) below and click <strong>Load</strong> to display it inside this slide.</p>
     <div style="margin-top: 24px; opacity: 0.5; font-size: 12px; color: #999;">
       Created by <strong>Pedro Hernandez</strong> &mdash; PeopleWorks Services
     </div>
   </div>
 
   <!-- Branding footer -->
-  <!-- MODIFIED: Added class="hidden" to hide the footer by default -->
   <div id="branding" class="hidden">
     <div class="brand-left">
       <div class="brand-logo">P</div>
@@ -357,41 +357,35 @@
     const envBadge = document.getElementById('envBadge');
     const btnOpenWindow = document.getElementById('btnOpenWindow');
 
-    // MODIFIED: Changed the default state to false (hidden)
     let controlsVisible = false;
-    let isOnline = false;        // true if running in PowerPoint Online
+    let isOnline = false;        
     let officeReady = false;
     let currentUrl = '';
     let loadTimeoutId = null;
     let iframeLoadFailed = false;
 
-    // ─── Detect environment ───────────────────────────────
     function detectEnvironment() {
       try {
         const platform = Office.context.platform;
         if (platform === Office.PlatformType.OfficeOnline) {
           isOnline = true;
           envBadge.textContent = 'POWERPOINT ONLINE';
-          // MODIFIED: Use classList to preserve the 'hidden' class
           envBadge.classList.add('online');
           envBadge.classList.remove('desktop');
           btnOpenWindow.style.display = '';
         } else {
           isOnline = false;
           envBadge.textContent = 'DESKTOP';
-          // MODIFIED: Use classList to preserve the 'hidden' class
           envBadge.classList.add('desktop');
           envBadge.classList.remove('online');
         }
       } catch (e) {
         envBadge.textContent = 'STANDALONE';
-        // MODIFIED: Use classList to preserve the 'hidden' class
         envBadge.classList.add('desktop');
         envBadge.classList.remove('online');
       }
     }
 
-    // ─── Normalize URL ────────────────────────────────────
     function normalizeUrl(url) {
       url = url.trim();
       if (!url) return '';
@@ -401,7 +395,6 @@
       return url;
     }
 
-    // ─── Validate URL ─────────────────────────────────────
     function isValidUrl(str) {
       try {
         new URL(str);
@@ -411,7 +404,6 @@
       }
     }
 
-    // ─── Show error in overlay ────────────────────────────
     function showError(title, message, showButtons) {
       overlay.classList.remove('hidden');
       let html = '<div class="emoji">⚠️</div>';
@@ -432,13 +424,12 @@
       loading.classList.remove('active');
     }
 
-    // ─── Show welcome screen ──────────────────────────────
     function showWelcome() {
       overlay.classList.remove('hidden');
       let html = '<div class="emoji">🌐</div>';
-      // MODIFIED: Updated welcome text to reflect the hidden controls
+      // MODIFIED: Updated welcome text to reflect bottom-right icon
       html += '<h2>Live Website Viewer</h2>';
-      html += '<p>Click the settings icon (⚙) in the top-right corner to enter a website URL.</p>';
+      html += '<p>Click the settings icon (⚙) in the bottom-right corner to enter a website URL.</p>';
 
       if (isOnline) {
         html += '<div class="tip" style="margin-top: 16px;"><strong>PowerPoint Online detected:</strong> Some websites may not display inside the frame. If a site does not load, use the <strong>"Window"</strong> button to open it in a separate browser window.</div>';
@@ -450,14 +441,12 @@
       overlay.innerHTML = html;
     }
 
-    // ─── Toggle controls ──────────────────────────────────
     function toggleControls() {
       controlsVisible = !controlsVisible;
       if (controlsVisible) {
         config.classList.remove('hidden');
         toggleBtn.classList.remove('visible');
         envBadge.classList.remove('hidden');
-        // Show branding only if no website is loaded
         if (!currentUrl) branding.classList.remove('hidden');
       } else {
         config.classList.add('hidden');
@@ -467,15 +456,12 @@
       }
     }
 
-    // ─── Open URL using Office Dialog API ─────────────────
     function openInDialog() {
       let url = currentUrl || normalizeUrl(urlInput.value);
       if (!url) {
         showError('Empty URL', 'Please enter a website URL first.', false);
         return;
       }
-
-      // Try Office Dialog API first (works great in Online)
       try {
         if (officeReady && Office.context.ui) {
           Office.context.ui.displayDialogAsync(url, {
@@ -484,7 +470,6 @@
             promptBeforeOpen: false
           }, function (result) {
             if (result.status === Office.AsyncResultStatus.Failed) {
-              // Fallback: open in new tab
               window.open(url, '_blank');
             }
           });
@@ -493,12 +478,9 @@
       } catch (e) {
         console.log('Dialog API not available:', e);
       }
-
-      // Fallback: open in new tab
       window.open(url, '_blank');
     }
 
-    // ─── Retry loading in iframe ──────────────────────────
     function retryLoad() {
       if (currentUrl) {
         overlay.classList.add('hidden');
@@ -509,7 +491,6 @@
       }
     }
 
-    // ─── Load timeout detection ───────────────────────────
     function startLoadTimeout() {
       clearTimeout(loadTimeoutId);
       iframeLoadFailed = false;
@@ -527,19 +508,15 @@
       }, isOnline ? 8000 : 15000);
     }
 
-    // ─── Save URL to Office settings ──────────────────────
     function saveUrl(url) {
       try {
         if (officeReady && Office.context && Office.context.document && Office.context.document.settings) {
           Office.context.document.settings.set('webViewerUrl', url);
           Office.context.document.settings.saveAsync();
         }
-      } catch (e) {
-        // Silent: Office API not available (standalone/testing mode)
-      }
+      } catch (e) { }
     }
 
-    // ─── Load URL into iframe ─────────────────────────────
     function loadUrl() {
       let url = normalizeUrl(urlInput.value);
 
@@ -562,16 +539,13 @@
       iframeLoadFailed = false;
 
       webFrame.src = url;
-
       startLoadTimeout();
       saveUrl(url);
     }
 
-    // ─── Handle iframe load events ────────────────────────
     webFrame.addEventListener('load', function () {
       clearTimeout(loadTimeoutId);
       loading.classList.remove('active');
-
       if (webFrame.src && webFrame.src !== 'about:blank' && webFrame.src !== '') {
         try {
           var doc = webFrame.contentDocument;
@@ -586,15 +560,12 @@
               return;
             }
           }
-        } catch (e) {
-          // CORS error = the site actually loaded (different origin)
-        }
+        } catch (e) { }
         overlay.classList.add('hidden');
         branding.classList.add('hidden');
       }
     });
 
-    // ─── Handle iframe errors ─────────────────────────────
     webFrame.addEventListener('error', function () {
       clearTimeout(loadTimeoutId);
       loading.classList.remove('active');
@@ -606,23 +577,18 @@
       );
     });
 
-    // ─── Enter key to load ────────────────────────────────
     urlInput.addEventListener('keydown', function (e) {
       if (e.key === 'Enter') {
         loadUrl();
       }
     });
 
-    // ─── Initialize with Office.js ────────────────────────
     Office.onReady(function () {
       officeReady = true;
-
       detectEnvironment();
-
       if (!currentUrl) {
         showWelcome();
       }
-
       try {
         if (Office.context && Office.context.document && Office.context.document.settings) {
           var savedUrl = Office.context.document.settings.get('webViewerUrl');
@@ -636,9 +602,7 @@
             startLoadTimeout();
           }
         }
-      } catch (e) {
-        // Silent: Office API not available (standalone/testing mode)
-      }
+      } catch (e) { }
     });
   </script>
 </body>

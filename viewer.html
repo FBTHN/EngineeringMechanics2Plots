@@ -8,7 +8,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       width: 100%; height: 100vh; font-family: 'Segoe UI', Arial, sans-serif; overflow: hidden;
-      background: #FFFFFF;
+      background: #FFF;
       padding: 3px;
     }
 
@@ -93,14 +93,24 @@
     .btn-hide:hover { background: #ddd; }
 
     /* Toggle button (when controls are hidden) */
-    #toggleBtn { 
-      position: absolute; top: 8px; right: 8px; z-index: 101;
-      width: 36px; height: 36px; border-radius: 50%; border: none;
-      background: rgba(255,255,255,0.9); cursor: pointer;
+    #toggleBtn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 101;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.9);
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      display: none; align-items: center; justify-content: center;  /* force visible */
+      cursor: pointer;
+      font-size: 16px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
     }
-
     #toggleBtn:hover { background: rgba(255,255,255,1); }
     #toggleBtn.visible { display: flex; }
 
@@ -284,7 +294,8 @@
 <div id="appWrapper">
 
   <!-- Control bar -->
-  <div id="config">
+  <!-- MODIFIED: Added class="hidden" to make the control bar hidden by default -->
+  <div id="config" class="hidden">
     <span class="icon">🌐</span>
     <input id="urlInput" type="text" placeholder="Enter website URL (e.g. https://example.com)" />
     <button class="btn btn-primary" onclick="loadUrl()">Load</button>
@@ -293,24 +304,26 @@
   </div>
 
   <!-- Show controls button -->
-  <button id="toggleBtn" onclick="toggleControls()" title="Show controls">⚙</button>
+  <!-- MODIFIED: Added class="visible" to show the toggle button by default -->
+  <button id="toggleBtn" class="visible" onclick="toggleControls()" title="Show controls">⚙</button>
 
-  <!-- Environment badge 
-  <div id="envBadge"></div>
-  -->
+  <!-- Environment badge -->
+  <!-- MODIFIED: Added class="hidden" to hide the badge by default -->
+  <div id="envBadge" class="hidden"></div>
 
   <!-- Welcome overlay -->
   <div id="overlay">
     <div class="emoji">🌐</div>
     <h2>Live Website Viewer</h2>
-    <p>Enter a website URL above and click <strong>Load</strong> to display it inside this slide.</p>
+    <p>Enter a website URL using the settings button (⚙) above and click <strong>Load</strong> to display it inside this slide.</p>
     <div style="margin-top: 24px; opacity: 0.5; font-size: 12px; color: #999;">
       Created by <strong>Pedro Hernandez</strong> &mdash; PeopleWorks Services
     </div>
   </div>
 
   <!-- Branding footer -->
-  <div id="branding">
+  <!-- MODIFIED: Added class="hidden" to hide the footer by default -->
+  <div id="branding" class="hidden">
     <div class="brand-left">
       <div class="brand-logo">P</div>
       <span class="brand-name">PeopleWorks</span>
@@ -344,6 +357,7 @@
     const envBadge = document.getElementById('envBadge');
     const btnOpenWindow = document.getElementById('btnOpenWindow');
 
+    // MODIFIED: Changed the default state to false (hidden)
     let controlsVisible = false;
     let isOnline = false;        // true if running in PowerPoint Online
     let officeReady = false;
@@ -351,27 +365,29 @@
     let loadTimeoutId = null;
     let iframeLoadFailed = false;
 
-
     // ─── Detect environment ───────────────────────────────
     function detectEnvironment() {
       try {
-        // Office.context.platform: 'OfficeOnline', 'PC', 'Mac', 'iOS', 'Android'
         const platform = Office.context.platform;
         if (platform === Office.PlatformType.OfficeOnline) {
           isOnline = true;
           envBadge.textContent = 'POWERPOINT ONLINE';
-          envBadge.className = 'online';
-          // Show the "Window" button for Online users
+          // MODIFIED: Use classList to preserve the 'hidden' class
+          envBadge.classList.add('online');
+          envBadge.classList.remove('desktop');
           btnOpenWindow.style.display = '';
         } else {
           isOnline = false;
           envBadge.textContent = 'DESKTOP';
-          envBadge.className = 'desktop';
+          // MODIFIED: Use classList to preserve the 'hidden' class
+          envBadge.classList.add('desktop');
+          envBadge.classList.remove('online');
         }
       } catch (e) {
-        // If Office API not available, assume standalone/testing
         envBadge.textContent = 'STANDALONE';
-        envBadge.className = 'desktop';
+        // MODIFIED: Use classList to preserve the 'hidden' class
+        envBadge.classList.add('desktop');
+        envBadge.classList.remove('online');
       }
     }
 
@@ -420,8 +436,9 @@
     function showWelcome() {
       overlay.classList.remove('hidden');
       let html = '<div class="emoji">🌐</div>';
+      // MODIFIED: Updated welcome text to reflect the hidden controls
       html += '<h2>Live Website Viewer</h2>';
-      html += '<p>Enter a website URL above and click <strong>Load</strong> to display it inside this slide.</p>';
+      html += '<p>Click the settings icon (⚙) in the top-right corner to enter a website URL.</p>';
 
       if (isOnline) {
         html += '<div class="tip" style="margin-top: 16px;"><strong>PowerPoint Online detected:</strong> Some websites may not display inside the frame. If a site does not load, use the <strong>"Window"</strong> button to open it in a separate browser window.</div>';
@@ -498,7 +515,6 @@
       iframeLoadFailed = false;
 
       loadTimeoutId = setTimeout(function () {
-        // If loading indicator is still active after timeout, iframe probably failed
         if (loading.classList.contains('active')) {
           iframeLoadFailed = true;
           showError(
@@ -508,7 +524,7 @@
             true
           );
         }
-      }, isOnline ? 8000 : 15000); // Shorter timeout for Online since it's more likely to fail
+      }, isOnline ? 8000 : 15000);
     }
 
     // ─── Save URL to Office settings ──────────────────────
@@ -537,23 +553,17 @@
         return;
       }
 
-      // Update input with normalized URL
       urlInput.value = url;
       currentUrl = url;
 
-      // Show loading, hide branding
       overlay.classList.add('hidden');
       branding.classList.add('hidden');
       loading.classList.add('active');
       iframeLoadFailed = false;
 
-      // Set iframe src
       webFrame.src = url;
 
-      // Start load timeout detection
       startLoadTimeout();
-
-      // Save URL
       saveUrl(url);
     }
 
@@ -563,13 +573,10 @@
       loading.classList.remove('active');
 
       if (webFrame.src && webFrame.src !== 'about:blank' && webFrame.src !== '') {
-        // Check if iframe actually loaded content (blank page detection)
         try {
-          // Try to access iframe document - if blocked by CORS, it loaded something
           var doc = webFrame.contentDocument;
           if (doc && doc.body) {
             var bodyContent = doc.body.innerHTML;
-            // If body is completely empty, the site might have blocked loading
             if (!bodyContent || bodyContent.trim() === '') {
               showError(
                 'Website appears blank',
@@ -581,7 +588,6 @@
           }
         } catch (e) {
           // CORS error = the site actually loaded (different origin)
-          // This is the GOOD case - site loaded from a different domain
         }
         overlay.classList.add('hidden');
         branding.classList.add('hidden');
@@ -611,16 +617,12 @@
     Office.onReady(function () {
       officeReady = true;
 
-      // Detect environment
       detectEnvironment();
 
-      // Update welcome screen with environment-specific tips
       if (!currentUrl) {
         showWelcome();
       }
 
-      
-      // Try to load saved URL for this slide
       try {
         if (Office.context && Office.context.document && Office.context.document.settings) {
           var savedUrl = Office.context.document.settings.get('webViewerUrl');
@@ -637,8 +639,6 @@
       } catch (e) {
         // Silent: Office API not available (standalone/testing mode)
       }
-      // Hide controls initially
-      toggleControls()
     });
   </script>
 </body>
